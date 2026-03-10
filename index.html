@@ -6,432 +6,498 @@
   <title>Farmology — Campaign Intelligence Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    /* ── DESIGN TOKENS ──────────────────────────────────── */
     :root {
-      --bg:          #F1F5F9;
-      --surface:     #FFFFFF;
-      --surface2:    #F8FAFC;
-      --surface3:    #F1F5F9;
-      --border:      #E2E8F0;
-      --border2:     #CBD5E1;
+      /* Primary */
+      --primary: #2F6BFF;
+      --primary-light: #4A85FF;
+      --primary-bg: #E9F2FF;
+      --primary-soft: #F1F6FF;
 
-      --text:        #0F172A;
-      --text2:       #64748B;
-      --text3:       #94A3B8;
+      /* Background & Surface */
+      --bg: #F6F8FB;
+      --surface: #FFFFFF;
+      --surface2: #F8FAFC;
+      --surface3: #F4F6F9;
 
-      --primary:     #2563EB;
-      --primary-lt:  #3B82F6;
-      --primary-soft:#EFF6FF;
-      --primary-mid: #BFDBFE;
+      /* Borders */
+      --border: #E6EBF2;
+      --border2: #EEF2F7;
 
-      --success:     #10B981;
-      --success-soft:#ECFDF5;
-      --warning:     #F59E0B;
-      --warning-soft:#FFFBEB;
-      --danger:      #EF4444;
-      --danger-soft: #FEF2F2;
-      --purple:      #8B5CF6;
-      --purple-soft: #F5F3FF;
-      --teal:        #06B6D4;
-      --teal-soft:   #ECFEFF;
+      /* Text */
+      --text: #2F3542;
+      --text2: #6B778C;
+      --text3: #9AA5B1;
 
-      --shadow-sm:   0 1px 2px rgba(0,0,0,.05);
-      --shadow:      0 4px 6px -1px rgba(0,0,0,.05);
-      --shadow-lg:   0 10px 15px -3px rgba(0,0,0,.10);
-      --radius:      10px;
-      --radius-sm:   6px;
-      --radius-lg:   16px;
+      /* Status */
+      --success: #2ECC71;
+      --success-bg: #E8F9F1;
+      --warning: #F5A623;
+      --warning-bg: #FFF3E0;
+      --danger: #E74C3C;
+      --danger-bg: #FDECEA;
+
+      /* Sidebar */
+      --sidebar-w: 250px;
+
+      /* Shadows */
+      --shadow-sm: 0px 1px 3px rgba(0,0,0,0.06), 0px 1px 2px rgba(0,0,0,0.04);
+      --shadow: 0px 2px 8px rgba(0,0,0,0.05);
+      --shadow-md: 0px 4px 16px rgba(0,0,0,0.08);
+      --shadow-lg: 0px 8px 32px rgba(0,0,0,0.1);
+
+      --radius-sm: 8px;
+      --radius: 10px;
+      --radius-lg: 14px;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
-      height: 100%; background: var(--bg);
-      color: var(--text); font-family: 'Inter', sans-serif;
-      font-size: 14px; line-height: 1.5; overflow-x: hidden;
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+      font-size: 14px;
     }
 
-    /* ── HEADER ─────────────────────────────────────────── */
-    .header {
-      position: sticky; top: 0; z-index: 50;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      box-shadow: var(--shadow-sm);
-    }
-    .header-inner {
-      display: flex; align-items: center; gap: 16px;
-      padding: 0 28px; height: 58px;
-    }
-    .logo-mark { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-    .logo-icon {
-      width: 34px; height: 34px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-lt));
-      border-radius: 9px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 16px;
-      box-shadow: 0 2px 8px rgba(47,107,255,.3);
-    }
-    .logo-text { font-size: 18px; font-weight: 700; color: var(--text); letter-spacing: -0.4px; }
-    .logo-text span { color: var(--primary); }
-    .header-sep { width: 1px; height: 22px; background: var(--border); margin: 0 4px; }
-    .header-tag {
-      font-size: 11px; font-weight: 600; color: var(--text2);
-      text-transform: uppercase; letter-spacing: 0.7px;
-      background: var(--surface3); border: 1px solid var(--border);
-      padding: 3px 10px; border-radius: 20px;
-    }
-
-    .header-nav { display: flex; gap: 6px; margin-left: auto; align-items: center; }
-    .nav-btn {
-      display: flex; align-items: center; gap: 6px;
-      padding: 7px 14px; border-radius: var(--radius-sm);
-      font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif;
-      text-decoration: none; color: var(--text2);
-      transition: all .15s ease; border: 1px solid transparent;
-      cursor: pointer; background: none;
-    }
-    .nav-btn:hover { background: var(--surface3); border-color: var(--border); color: var(--text); }
-    .nav-btn-danger { color: var(--danger) !important; }
-    .nav-btn-danger:hover { background: var(--danger-soft) !important; border-color: #f5a8a0 !important; }
-    .nav-btn-primary {
-      background: var(--primary); color: #fff !important;
-      border-color: var(--primary) !important;
-      box-shadow: 0 2px 8px rgba(47,107,255,.28);
-    }
-    .nav-btn-primary:hover {
-      background: var(--primary-lt) !important; transform: translateY(-1px);
-      box-shadow: 0 4px 14px rgba(47,107,255,.4);
-    }
-
-    /* ── PAGE TABS ──────────────────────────────────────── */
-    .page-tabs {
-      display: flex; gap: 2px; padding: 0 28px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-    }
-    .page-tab {
-      padding: 10px 16px; font-size: 13px; font-weight: 600;
-      color: var(--text2); cursor: pointer;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -1px; transition: all .15s;
-      display: flex; align-items: center; gap: 6px;
-      white-space: nowrap;
-    }
-    .page-tab:hover { color: var(--primary); }
-    .page-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
-
-    /* ── LAYOUT ─────────────────────────────────────────── */
-    .layout { display: flex; min-height: calc(100vh - 103px); }
-
-    /* ── SIDEBAR ─────────────────────────────────────────── */
+    /* ── SIDEBAR ─────────────────────────────────────── */
     .sidebar {
-      width: 252px; flex-shrink: 0;
+      position: fixed;
+      top: 0; left: 0;
+      width: var(--sidebar-w);
+      height: 100vh;
       background: var(--surface);
       border-right: 1px solid var(--border);
-      padding: 18px 14px;
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
       overflow-y: auto;
-      position: sticky; top: 103px;
-      height: calc(100vh - 103px);
     }
-    .sidebar-title {
+
+    .sidebar-logo {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sidebar-logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+      box-shadow: 0 2px 8px rgba(47,107,255,.3);
+      flex-shrink: 0;
+    }
+    .sidebar-logo-text {
+      font-size: 17px; font-weight: 800;
+      color: var(--text); letter-spacing: -0.3px;
+    }
+    .sidebar-logo-text span { color: var(--primary); }
+    .sidebar-tag {
+      margin: 12px 16px 0;
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.2px;
+      color: var(--text3);
+      background: var(--surface3);
+      border: 1px solid var(--border);
+      padding: 3px 10px; border-radius: 20px;
+      display: inline-block;
+    }
+
+    .sidebar-section-title {
       font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
       text-transform: uppercase; color: var(--text3);
-      padding: 0 6px 12px; border-bottom: 1px solid var(--border);
-      margin-bottom: 16px; display: flex; align-items: center; gap: 6px;
+      padding: 16px 20px 8px;
     }
-    .filter-group { margin-bottom: 13px; }
+
+    .sidebar-nav { flex: 1; padding: 8px 0; }
+
+    .page-tab {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 16px;
+      margin: 2px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 600;
+      color: var(--text2);
+      cursor: pointer;
+      transition: all .15s ease;
+    }
+    .page-tab:hover { background: var(--surface3); color: var(--text); }
+    .page-tab.active { background: var(--primary-bg); color: var(--primary); }
+    .page-tab .tab-icon {
+      width: 28px; height: 28px;
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      background: var(--surface3);
+      flex-shrink: 0;
+    }
+    .page-tab.active .tab-icon { background: var(--primary-soft); }
+
+    .sidebar-divider { border: none; border-top: 1px solid var(--border); margin: 8px 0; }
+
+    /* Filters inside sidebar */
+    .sidebar-filters { padding: 8px 12px 16px; }
+    .filter-group { margin-bottom: 12px; }
     .filter-label {
-      font-size: 11px; font-weight: 600; color: var(--text2);
-      text-transform: uppercase; letter-spacing: .6px;
-      margin-bottom: 5px; display: flex; align-items: center; gap: 4px;
+      font-size: 10px; font-weight: 700; color: var(--text3);
+      text-transform: uppercase; letter-spacing: .8px;
+      margin-bottom: 5px;
     }
     .filter-input, .filter-select {
-      width: 100%; padding: 8px 12px;
+      width: 100%; padding: 8px 10px;
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
       background: var(--surface2);
-      font-family: 'Inter', sans-serif;
-      font-size: 13px; font-weight: 500; color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 12px; font-weight: 500;
+      color: var(--text);
       transition: all .15s; outline: none;
       appearance: none; cursor: pointer;
     }
     .filter-input:focus, .filter-select:focus {
-      border-color: var(--primary); background: #fff;
+      border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(47,107,255,.1);
+      background: white;
     }
     .filter-select-wrap { position: relative; }
     .filter-select-wrap::after {
-      content: '▾'; position: absolute; right: 10px; top: 50%;
+      content: '▾'; position: absolute; right: 9px; top: 50%;
       transform: translateY(-50%); color: var(--text3);
-      font-size: 11px; pointer-events: none;
+      font-size: 10px; pointer-events: none;
     }
+    .filter-divider { border: none; border-top: 1px dashed var(--border); margin: 12px 0; }
     .sidebar-reset {
       width: 100%; padding: 9px;
       background: var(--surface3); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); font-family: 'Inter', sans-serif;
-      font-size: 13px; font-weight: 600; color: var(--text2);
-      cursor: pointer; transition: all .15s; margin-top: 4px;
+      border-radius: var(--radius-sm); font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 12px; font-weight: 600; color: var(--text2);
+      cursor: pointer; transition: all .15s;
     }
-    .sidebar-reset:hover { background: var(--danger-soft); border-color: #f5a8a0; color: var(--danger); }
-    .filter-divider { border: none; border-top: 1px dashed var(--border); margin: 13px 0; }
+    .sidebar-reset:hover { background: var(--danger-bg); border-color: #fca5a5; color: var(--danger); }
 
-    /* ── MAIN ────────────────────────────────────────────── */
-    .main { flex: 1; padding: 22px 22px; overflow: hidden; }
+    /* ── TOP HEADER ─────────────────────────────────── */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: var(--sidebar-w);
+      right: 0;
+      height: 60px;
+      background: rgba(255,255,255,.97);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center;
+      padding: 0 28px;
+      gap: 12px;
+      z-index: 90;
+      box-shadow: var(--shadow-sm);
+    }
+    .topbar-breadcrumb {
+      font-size: 13px; font-weight: 600; color: var(--text2);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .topbar-breadcrumb .sep { color: var(--border); }
+    .topbar-title { font-size: 15px; font-weight: 700; color: var(--text); }
+    .topbar-spacer { flex: 1; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px; border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all .15s;
+      border: 1px solid transparent;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .btn-primary {
+      background: var(--primary); color: white;
+      border-color: var(--primary);
+    }
+    .btn-primary:hover { background: var(--primary-light); box-shadow: 0 4px 12px rgba(47,107,255,.3); transform: translateY(-1px); }
+    .btn-outline {
+      background: white; color: var(--text2);
+      border-color: var(--border);
+    }
+    .btn-outline:hover { background: var(--surface3); color: var(--text); }
+    .btn-danger { color: var(--danger); background: white; border-color: var(--border); }
+    .btn-danger:hover { background: var(--danger-bg); border-color: #fca5a5; }
 
-    /* ── KPI CARDS ───────────────────────────────────────── */
-    .kpi-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 20px; }
+    /* ── MAIN LAYOUT ─────────────────────────────────── */
+    .app-shell { display: flex; min-height: 100vh; }
+    .main {
+      margin-left: var(--sidebar-w);
+      padding-top: 60px;
+      flex: 1;
+      padding-left: 28px;
+      padding-right: 28px;
+      padding-bottom: 28px;
+      min-width: 0;
+    }
+    .main-inner { padding-top: 24px; }
+
+    /* ── KPI CARDS ────────────────────────────────────── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 24px;
+    }
     .kpi-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border-radius: var(--radius-lg);
       padding: 20px;
       box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
       transition: all .2s ease;
-      position: relative; overflow: hidden;
     }
-    .kpi-card::after {
-      content: ''; position: absolute;
-      top: 0; left: 0; right: 0; height: 3px;
-      background: var(--kpi-col);
-      border-radius: var(--radius) var(--radius) 0 0;
-    }
-    .kpi-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+    .kpi-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
     .kpi-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
     .kpi-icon {
       width: 40px; height: 40px;
-      background: var(--kpi-bg);
-      border-radius: 10px;
+      border-radius: var(--radius-sm);
       display: flex; align-items: center; justify-content: center;
       font-size: 18px;
     }
+    .kpi-icon-blue { background: var(--primary-soft); }
+    .kpi-icon-green { background: var(--success-bg); }
+    .kpi-icon-amber { background: var(--warning-bg); }
+    .kpi-icon-red { background: var(--danger-bg); }
+    .kpi-icon-purple { background: #f0ebff; }
+    .kpi-icon-teal { background: #e0f7f7; }
+
     .kpi-badge {
       font-size: 11px; font-weight: 700;
-      padding: 3px 9px; border-radius: 20px;
-      background: var(--kpi-bg); color: var(--kpi-col);
-      letter-spacing: .3px;
+      padding: 3px 8px; border-radius: 20px;
+      font-family: 'Plus Jakarta Sans', monospace;
     }
+    .kpi-badge-blue { background: var(--primary-bg); color: var(--primary); }
+    .kpi-badge-green { background: var(--success-bg); color: var(--success); }
+    .kpi-badge-amber { background: var(--warning-bg); color: var(--warning); }
+    .kpi-badge-red { background: var(--danger-bg); color: var(--danger); }
+
     .kpi-val {
-      font-size: 30px; font-weight: 700; color: var(--text);
-      line-height: 1; margin-bottom: 4px; letter-spacing: -1px;
+      font-size: 32px; font-weight: 800;
+      color: var(--text); line-height: 1;
+      margin-bottom: 4px; letter-spacing: -0.5px;
     }
     .kpi-label { font-size: 12px; font-weight: 600; color: var(--text2); }
-    .kpi-sub   { font-size: 11px; color: var(--text3); margin-top: 4px; }
-    .kpi-bar   { height: 3px; background: var(--border); border-radius: 3px; margin-top: 14px; overflow: hidden; }
-    .kpi-bar-fill { height: 100%; background: var(--kpi-col); border-radius: 3px; transition: width 1s ease; }
+    .kpi-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+    .kpi-bar { height: 3px; background: var(--border); border-radius: 3px; margin-top: 14px; overflow: hidden; }
+    .kpi-bar-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
 
-    /* KPI color themes */
-    .kpi-green  { --kpi-col: var(--success);  --kpi-bg: var(--success-soft); }
-    .kpi-amber  { --kpi-col: var(--warning);  --kpi-bg: var(--warning-soft); }
-    .kpi-red    { --kpi-col: var(--danger);   --kpi-bg: var(--danger-soft);  }
-    .kpi-blue   { --kpi-col: var(--primary);  --kpi-bg: var(--primary-soft); }
-    .kpi-purple { --kpi-col: var(--purple);   --kpi-bg: var(--purple-soft);  }
-    .kpi-teal   { --kpi-col: var(--teal);     --kpi-bg: var(--teal-soft);    }
+    /* ── SECTION / PAGE ─────────────────────────────── */
+    .page-section { display: none; }
+    .page-section.active { display: block; }
 
-    /* ── SECTION HEADING ─────────────────────────────────── */
-    .section-title {
-      font-size: 17px; font-weight: 700; color: var(--text);
-      margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
+    .section-heading {
+      font-size: 16px; font-weight: 700; color: var(--text);
+      margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
     }
-    .section-title span { font-size: 12px; font-weight: 500; color: var(--text3); }
+    .section-heading .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--primary); display: inline-block;
+    }
+    .section-heading span { font-size: 12px; font-weight: 500; color: var(--text3); }
 
-    /* ── GRIDS ───────────────────────────────────────────── */
-    .grid-2  { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-    .grid-3  { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-    .grid-12 { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 16px; }
-    .col-span-2 { grid-column: span 2; }
-    .col-span-3 { grid-column: span 3; }
-
-    /* ── CARD ────────────────────────────────────────────── */
+    /* ── CARD ────────────────────────────────────────── */
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border-radius: var(--radius-lg);
       padding: 20px;
       box-shadow: var(--shadow);
     }
     .card-title {
-      font-size: 11px; font-weight: 700; color: var(--text2);
-      text-transform: uppercase; letter-spacing: .8px;
+      font-size: 12px; font-weight: 700; color: var(--text2);
+      text-transform: uppercase; letter-spacing: .9px;
       margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
     }
-    .card-title-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--primary); display: inline-block; }
+    .card-title-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--primary); display: inline-block;
+    }
 
-    /* ── TABLE ───────────────────────────────────────────── */
+    /* ── GRID LAYOUTS ────────────────────────────────── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    .grid-12 { display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 20px; }
+    .col-span-2 { grid-column: span 2; }
+    .col-span-3 { grid-column: span 3; }
+
+    /* ── TABLE ───────────────────────────────────────── */
     .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
     .data-table th {
-      text-align: left; padding: 10px 12px;
-      font-size: 10px; font-weight: 700; letter-spacing: .7px;
+      text-align: left; padding: 10px 14px;
+      font-size: 11px; font-weight: 700; letter-spacing: .8px;
       text-transform: uppercase; color: var(--text2);
       background: var(--surface2); border-bottom: 1px solid var(--border);
     }
     .data-table td {
-      padding: 10px 12px; border-bottom: 1px solid #EEF2F7;
+      padding: 10px 14px; border-bottom: 1px solid var(--border2);
       color: var(--text2); font-weight: 500;
     }
     .data-table tr:last-child td { border-bottom: none; }
     .data-table tr:hover td { background: #F9FBFF; }
-    .data-table .mono { font-variant-numeric: tabular-nums; font-size: 12px; }
+    .data-table .mono { font-size: 12px; letter-spacing: 0.2px; }
 
-    /* ── BADGES ──────────────────────────────────────────── */
+    /* ── BADGES ──────────────────────────────────────── */
     .badge {
-      display: inline-flex; align-items: center; gap: 3px;
+      display: inline-flex; align-items: center; gap: 4px;
       padding: 3px 10px; border-radius: 20px;
       font-size: 11px; font-weight: 700;
     }
-    .badge-green { background: var(--success-soft); color: var(--success); }
-    .badge-red   { background: var(--danger-soft);  color: var(--danger);  }
-    .badge-amber { background: var(--warning-soft); color: var(--warning); }
-    .badge-blue  { background: var(--primary-soft); color: var(--primary); }
+    .badge-green { background: var(--success-bg); color: var(--success); }
+    .badge-red   { background: var(--danger-bg);  color: var(--danger); }
+    .badge-amber { background: var(--warning-bg); color: var(--warning); }
+    .badge-blue  { background: var(--primary-bg); color: var(--primary); }
 
-    /* ── PROGRESS BAR ────────────────────────────────────── */
-    .prog-bar  { height: 5px; background: var(--border); border-radius: 4px; overflow: hidden; flex: 1; }
+    /* ── PROGRESS BAR ────────────────────────────────── */
+    .prog-bar { height: 6px; background: var(--border); border-radius: 4px; overflow: hidden; flex: 1; }
     .prog-fill { height: 100%; border-radius: 4px; transition: width .8s ease; }
 
-    /* ── MAP ─────────────────────────────────────────────── */
-    #mapContainer { height: 450px; border-radius: var(--radius-sm); overflow: hidden; }
-    .leaflet-container { font-family: 'Inter', sans-serif !important; background: var(--surface2); }
+    /* ── MAP ─────────────────────────────────────────── */
+    #mapContainer { height: 480px; border-radius: var(--radius); overflow: hidden; }
+    .leaflet-container { font-family: 'Plus Jakarta Sans', sans-serif !important; background: var(--surface2); }
     .leaflet-popup-content-wrapper {
       border-radius: 12px !important;
       box-shadow: var(--shadow-lg) !important;
       border: 1px solid var(--border) !important;
     }
-    .leaflet-popup-content { margin: 0 !important; font-family: 'Inter', sans-serif; }
-    .map-popup { padding: 0; min-width: 256px; }
+    .leaflet-popup-content { margin: 0 !important; font-family: 'Plus Jakarta Sans', sans-serif; }
+    .map-popup { padding: 0; min-width: 280px; }
     .map-popup-head {
-      background: linear-gradient(135deg, var(--primary), var(--primary-lt));
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
       padding: 14px 18px; border-radius: 10px 10px 0 0; color: white;
     }
-    .map-popup-head h4 { font-size: 18px; font-weight: 700; }
-    .map-popup-head p  { font-size: 12px; opacity: .85; margin-top: 2px; }
+    .map-popup-head h4 { font-size: 18px; font-weight: 800; }
+    .map-popup-head p { font-size: 12px; opacity: .8; margin-top: 2px; }
     .map-popup-body { padding: 14px 18px; }
     .map-row {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 7px 0; border-bottom: 1px solid var(--border);
+      padding: 8px 0; border-bottom: 1px solid var(--border);
     }
     .map-row:last-child { border-bottom: none; }
     .map-row-label { font-size: 12px; color: var(--text2); font-weight: 600; }
-    .map-row-val   { font-size: 18px; font-weight: 700; }
+    .map-row-val { font-size: 18px; font-weight: 800; }
     .map-marker-div {
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      background: white; border-radius: 50%; border: 3px solid;
-      width: 60px; height: 60px;
-      box-shadow: 0 4px 14px rgba(0,0,0,.15);
-      font-family: 'Inter', sans-serif;
+      background: white; border-radius: 50%;
+      border: 3px solid;
+      width: 64px; height: 64px;
+      box-shadow: 0 4px 16px rgba(0,0,0,.15);
       transition: transform .2s; cursor: pointer;
     }
     .map-marker-div:hover { transform: scale(1.15); }
-    .map-marker-count { font-size: 17px; font-weight: 700; line-height: 1; }
-    .map-marker-label { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; opacity: .65; }
+    .map-marker-count { font-size: 16px; line-height: 1; font-weight: 800; }
+    .map-marker-label { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; opacity: .7; }
 
-    /* ── PAGE SECTIONS ───────────────────────────────────── */
-    .page-section { display: none; }
-    .page-section.active { display: block; }
-
-    /* ── REPEAT FARMERS ──────────────────────────────────── */
-    .repeat-summary { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 20px; }
-    .repeat-stat {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 20px;
-      text-align: center; box-shadow: var(--shadow);
-    }
-    .repeat-stat-val   { font-size: 30px; font-weight: 700; color: var(--primary); letter-spacing: -1px; }
-    .repeat-stat-label { font-size: 12px; color: var(--text2); font-weight: 600; margin-top: 4px; }
-
-    /* ── LOGIN ───────────────────────────────────────────── */
+    /* ── LOGIN ───────────────────────────────────────── */
     .login-overlay {
       position: fixed; inset: 0;
-      background: linear-gradient(135deg, rgba(15,30,75,.93), rgba(47,107,255,.82));
+      background: linear-gradient(135deg, rgba(30,60,120,.95), rgba(47,107,255,.9));
       display: flex; align-items: center; justify-content: center;
-      z-index: 999; backdrop-filter: blur(14px);
+      z-index: 999; backdrop-filter: blur(16px);
     }
     .login-box {
-      background: #fff; border-radius: var(--radius-lg);
-      padding: 40px; width: min(92vw, 400px);
-      box-shadow: 0 32px 80px rgba(0,0,0,.22);
+      background: white; border-radius: var(--radius-lg);
+      padding: 40px; width: min(92vw, 420px);
+      box-shadow: 0 32px 80px rgba(0,0,0,.2);
       animation: loginIn .4s ease;
     }
     @keyframes loginIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
     .login-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
     .login-logo-icon {
       width: 40px; height: 40px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-lt));
-      border-radius: 11px; display: flex; align-items: center; justify-content: center;
-      font-size: 20px; box-shadow: 0 4px 12px rgba(47,107,255,.35);
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px;
     }
-    .login-logo-text { font-size: 24px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
+    .login-logo-text { font-size: 24px; font-weight: 800; color: var(--text); }
     .login-logo-text span { color: var(--primary); }
-    .login-sub { font-size: 13px; color: var(--text2); margin-bottom: 28px; }
-    .login-field { margin-bottom: 14px; }
-    .login-field label {
-      display: block; font-size: 11px; font-weight: 700; color: var(--text2);
-      text-transform: uppercase; letter-spacing: .7px; margin-bottom: 6px;
-    }
+    .login-sub { font-size: 13px; color: var(--text3); margin-bottom: 28px; }
+    .login-field { margin-bottom: 16px; }
+    .login-field label { display: block; font-size: 11px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 6px; }
     .login-field input {
-      width: 100%; padding: 11px 13px;
+      width: 100%; padding: 12px 14px;
       border: 1px solid var(--border); border-radius: var(--radius-sm);
-      font-family: 'Inter', sans-serif; font-size: 14px; color: var(--text);
-      outline: none; transition: all .15s;
+      font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px;
+      color: var(--text); outline: none; transition: all .15s;
     }
     .login-field input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(47,107,255,.12); }
     .login-btn {
-      width: 100%; padding: 12px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-lt));
+      width: 100%; padding: 13px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
       color: white; border: none; border-radius: var(--radius-sm);
-      font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700;
+      font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700;
       cursor: pointer; margin-top: 8px;
-      transition: all .2s; box-shadow: 0 4px 14px rgba(47,107,255,.35);
+      transition: all .2s; box-shadow: 0 4px 12px rgba(47,107,255,.3);
     }
-    .login-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(47,107,255,.45); }
+    .login-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(47,107,255,.4); }
     .login-err { color: var(--danger); font-size: 12px; min-height: 16px; margin-top: 10px; font-weight: 600; }
 
-    /* ── FOOTER ──────────────────────────────────────────── */
+    /* ── REPEAT FARMERS ─────────────────────────────── */
+    .repeat-summary { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 20px; }
+    .repeat-stat {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 20px;
+      text-align: center; box-shadow: var(--shadow);
+    }
+    .repeat-stat-val { font-size: 32px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
+    .repeat-stat-label { font-size: 12px; color: var(--text2); font-weight: 600; margin-top: 4px; }
+
+    /* ── SKU GRID ────────────────────────────────────── */
+    .sku-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap: 12px; margin-bottom: 20px; }
+    .sku-card {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 14px 16px;
+      transition: all .2s;
+    }
+    .sku-card:hover { background: white; box-shadow: var(--shadow-md); border-color: #c7d8ff; }
+    .sku-name { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+    .sku-variant { font-size: 11px; color: var(--text3); margin-bottom: 8px; }
+    .sku-qty { font-size: 26px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
+    .sku-unit { font-size: 11px; color: var(--text3); font-weight: 600; }
+
+    /* ── FLATPICKR OVERRIDE ─────────────────────────── */
+    .flatpickr-day.selected { background: var(--primary) !important; border-color: var(--primary) !important; }
+    .flatpickr-day.inRange { background: var(--primary-bg) !important; border-color: var(--primary-bg) !important; }
+
+    /* ── DISTRICT TABLE ─────────────────────────────── */
+    .district-table-wrap { overflow-x: auto; }
+
+    /* ── FOOTER ─────────────────────────────────────── */
     .footer {
+      margin-left: var(--sidebar-w);
       padding: 14px 28px; text-align: center;
       font-size: 12px; color: var(--text3); font-weight: 500;
       border-top: 1px solid var(--border); background: var(--surface);
     }
 
-    /* ── FLATPICKR ───────────────────────────────────────── */
-    .flatpickr-day.selected { background: var(--primary) !important; border-color: var(--primary) !important; }
-    .flatpickr-day.inRange  { background: var(--primary-soft) !important; border-color: var(--primary-soft) !important; }
-
-    /* ── SKU GRID ────────────────────────────────────────── */
-    .sku-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px,1fr)); gap: 12px; margin-bottom: 20px; }
-    .sku-card {
-      background: var(--surface2); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); padding: 14px 16px;
-      transition: all .2s;
-    }
-    .sku-card:hover { background: #fff; box-shadow: var(--shadow); border-color: var(--primary-mid); }
-    .sku-name    { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
-    .sku-variant { font-size: 11px; color: var(--text3); margin-bottom: 10px; }
-    .sku-qty     { font-size: 26px; font-weight: 700; color: var(--primary); letter-spacing: -0.5px; }
-    .sku-unit    { font-size: 11px; color: var(--text2); font-weight: 600; }
-
-    /* ── DISTRICT ────────────────────────────────────────── */
-    .district-table-wrap { overflow-x: auto; }
-
-    /* ── RESPONSIVE ──────────────────────────────────────── */
+    /* ── RESPONSIVE ─────────────────────────────────── */
     @media (max-width: 1100px) {
-      .kpi-row { grid-template-columns: repeat(2,1fr); }
-      .grid-2  { grid-template-columns: 1fr; }
-      .grid-3  { grid-template-columns: 1fr; }
+      .kpi-row { grid-template-columns: repeat(2, 1fr); }
+      .grid-2 { grid-template-columns: 1fr; }
+      .grid-3 { grid-template-columns: 1fr; }
       .col-span-2, .col-span-3 { grid-column: span 1; }
-      .sidebar { display: none; }
+    }
+    @media (max-width: 900px) {
+      .sidebar { transform: translateX(-100%); }
+      .main, .footer { margin-left: 0; }
+      .topbar { left: 0; }
     }
     @media (max-width: 640px) {
-      .main { padding: 14px; }
+      .main { padding-left: 16px; padding-right: 16px; }
       .kpi-row { grid-template-columns: 1fr; }
-      .header-inner { padding: 0 16px; }
     }
   </style>
 </head>
@@ -441,7 +507,7 @@
 <div class="login-overlay" id="loginOverlay">
   <form class="login-box" id="loginForm" onsubmit="handleLogin(event)">
     <div class="login-logo">
-      <div class="login-logo-icon"><i data-lucide="leaf" style="width:20px;height:20px;"></i></div>
+      <div class="login-logo-icon">🌱</div>
       <div class="login-logo-text">Farm<span>ology</span></div>
     </div>
     <p class="login-sub">Campaign Intelligence Dashboard — Secure Access</p>
@@ -459,415 +525,412 @@
 </div>
 
 <!-- APP SHELL -->
-<header class="header">
-  <div class="header-inner">
-    <a class="logo-mark" href="#">
-      <div class="logo-icon"><i data-lucide="leaf" style="width:18px;height:18px;"></i></div>
-      <div class="logo-text">Farm<span>ology</span></div>
-    </a>
-    <div class="header-sep"></div>
-    <span class="header-tag">West Bengal Campaign</span>
-    <nav class="header-nav" style="margin-left:auto; display:flex; gap:6px; align-items:center;">
-      <button class="nav-btn nav-btn-primary" id="downloadBtn">⬇ Export CSV</button>
-      <button class="nav-btn nav-btn-danger" id="logoutBtn">Sign Out</button>
-    </nav>
-  </div>
-  <div class="page-tabs">
-    <div class="page-tab active" data-tab="overview">📊 Overview</div>
-    <div class="page-tab" data-tab="fa">👤 FA Performance</div>
-    <div class="page-tab" data-tab="retailer">🏪 Retailer Analytics</div>
-    <div class="page-tab" data-tab="district">📍 District Insights</div>
-    <div class="page-tab" data-tab="sku">📦 SKU Analysis</div>
-    <div class="page-tab" data-tab="repeat">🔁 Repeat Farmers</div>
-  </div>
-</header>
+<div class="app-shell">
 
-<div class="layout">
-  <!-- SIDEBAR FILTERS -->
+  <!-- SIDEBAR -->
   <aside class="sidebar">
-    <div class="sidebar-title">⚙ Filters</div>
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">🌱</div>
+      <div class="sidebar-logo-text">Farm<span>ology</span></div>
+    </div>
+    <span class="sidebar-tag">West Bengal Campaign</span>
 
-    <div class="filter-group">
-      <div class="filter-label">📅 Date Range</div>
-      <input class="filter-input" id="dateRange" placeholder="Select range…" readonly />
+    <div class="sidebar-nav" style="margin-top:8px;">
+      <div class="sidebar-section-title">Navigation</div>
+      <div class="page-tab active" data-tab="overview"><span class="tab-icon">📊</span> Overview</div>
+      <div class="page-tab" data-tab="fa"><span class="tab-icon">👤</span> FA Performance</div>
+      <div class="page-tab" data-tab="retailer"><span class="tab-icon">🏪</span> Retailer Analytics</div>
+      <div class="page-tab" data-tab="district"><span class="tab-icon">📍</span> District Insights</div>
+      <div class="page-tab" data-tab="sku"><span class="tab-icon">📦</span> SKU Analysis</div>
+      <div class="page-tab" data-tab="repeat"><span class="tab-icon">🔁</span> Repeat Farmers</div>
     </div>
-    <hr class="filter-divider">
-    <div class="filter-group">
-      <div class="filter-label">🌍 State</div>
-      <div class="filter-select-wrap">
-        <select class="filter-select" id="fState"></select>
+
+    <hr class="sidebar-divider">
+    <div class="sidebar-section-title" style="padding-bottom:6px;">⚙ Filters</div>
+    <div class="sidebar-filters">
+      <div class="filter-group">
+        <div class="filter-label">📅 Date Range</div>
+        <input class="filter-input" id="dateRange" placeholder="Select range…" readonly />
       </div>
-    </div>
-    <div class="filter-group">
-      <div class="filter-label">📍 District</div>
-      <div class="filter-select-wrap">
-        <select class="filter-select" id="fDistrict"></select>
+      <hr class="filter-divider">
+      <div class="filter-group">
+        <div class="filter-label">🌍 State</div>
+        <div class="filter-select-wrap"><select class="filter-select" id="fState"></select></div>
       </div>
-    </div>
-    <hr class="filter-divider">
-    <div class="filter-group">
-      <div class="filter-label">🏪 Retailer</div>
-      <div class="filter-select-wrap">
-        <select class="filter-select" id="fRetailer"></select>
+      <div class="filter-group">
+        <div class="filter-label">📍 District</div>
+        <div class="filter-select-wrap"><select class="filter-select" id="fDistrict"></select></div>
       </div>
-    </div>
-    <div class="filter-group">
-      <div class="filter-label">👤 FA (PT)</div>
-      <div class="filter-select-wrap">
-        <select class="filter-select" id="fPT"></select>
+      <hr class="filter-divider">
+      <div class="filter-group">
+        <div class="filter-label">🏪 Retailer</div>
+        <div class="filter-select-wrap"><select class="filter-select" id="fRetailer"></select></div>
       </div>
-    </div>
-    <div class="filter-group">
-      <div class="filter-label">🌐 Zone</div>
-      <div class="filter-select-wrap">
-        <select class="filter-select" id="fZone"></select>
+      <div class="filter-group">
+        <div class="filter-label">👤 FA (PT)</div>
+        <div class="filter-select-wrap"><select class="filter-select" id="fPT"></select></div>
       </div>
-    </div>
-    <hr class="filter-divider">
-    <div class="filter-group">
-      <div class="filter-label">📦 Product</div>
-      <div class="filter-select-wrap">
-        <select class="filter-select" id="fProduct"></select>
+      <div class="filter-group">
+        <div class="filter-label">🌐 Zone</div>
+        <div class="filter-select-wrap"><select class="filter-select" id="fZone"></select></div>
       </div>
-    </div>
-    <div class="filter-group">
-      <div class="filter-label">📏 Unit</div>
-      <div class="filter-select-wrap">
-        <select class="filter-select" id="fUnit"></select>
+      <hr class="filter-divider">
+      <div class="filter-group">
+        <div class="filter-label">📦 Product</div>
+        <div class="filter-select-wrap"><select class="filter-select" id="fProduct"></select></div>
       </div>
-    </div>
-    <div class="filter-group">
-      <div class="filter-label">✅ Status</div>
-      <div class="filter-select-wrap">
-        <select class="filter-select" id="fStatus"></select>
+      <div class="filter-group">
+        <div class="filter-label">📏 Unit</div>
+        <div class="filter-select-wrap"><select class="filter-select" id="fUnit"></select></div>
       </div>
-    </div>
-    <div class="filter-group">
-      <div class="filter-label">📱 Source</div>
-      <div class="filter-select-wrap">
-        <select class="filter-select" id="fSource"></select>
+      <div class="filter-group">
+        <div class="filter-label">✅ Status</div>
+        <div class="filter-select-wrap"><select class="filter-select" id="fStatus"></select></div>
       </div>
+      <div class="filter-group">
+        <div class="filter-label">📱 Source</div>
+        <div class="filter-select-wrap"><select class="filter-select" id="fSource"></select></div>
+      </div>
+      <hr class="filter-divider">
+      <button class="sidebar-reset" id="resetBtn">↺ Reset All Filters</button>
     </div>
-    <hr class="filter-divider">
-    <button class="sidebar-reset" id="resetBtn">↺ Reset All Filters</button>
   </aside>
 
-  <!-- MAIN -->
-  <main class="main">
+  <!-- MAIN AREA -->
+  <div style="flex:1; min-width:0; display:flex; flex-direction:column;">
 
-    <!-- ══ TAB: OVERVIEW ══════════════════════════════ -->
-    <div class="page-section active" id="tab-overview">
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-breadcrumb">
+        <span>Farmology</span>
+        <span class="sep">/</span>
+        <span class="topbar-title">Campaign Intelligence</span>
+      </div>
+      <div class="topbar-spacer"></div>
+      <button class="btn btn-outline" id="downloadBtn">⬇ Export CSV</button>
+      <button class="btn btn-danger" id="logoutBtn">Sign Out</button>
+    </header>
 
-      <!-- KPIs Row 1 -->
-      <div class="kpi-row">
-        <div class="kpi-card kpi-green">
-          <div class="kpi-top">
-            <div class="kpi-icon">🌾</div>
-            <div class="kpi-badge" id="k1Badge">Live</div>
+    <!-- MAIN CONTENT -->
+    <main class="main">
+      <div class="main-inner">
+
+        <!-- ══ TAB: OVERVIEW ══════════════════════════════ -->
+        <div class="page-section active" id="tab-overview">
+
+          <!-- KPIs Row 1 -->
+          <div class="kpi-row">
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <div class="kpi-icon kpi-icon-blue">🌾</div>
+                <div class="kpi-badge kpi-badge-blue" id="k1Badge">Live</div>
+              </div>
+              <div class="kpi-val" id="kTotalScans">0</div>
+              <div class="kpi-label">Total Scans</div>
+              <div class="kpi-sub" id="kScansSub">All time</div>
+              <div class="kpi-bar"><div class="kpi-bar-fill" id="kTotalBar" style="width:100%;background:var(--primary)"></div></div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <div class="kpi-icon kpi-icon-green">✅</div>
+                <div class="kpi-badge kpi-badge-green" id="kApprovedBadge">0%</div>
+              </div>
+              <div class="kpi-val" id="kApproved">0</div>
+              <div class="kpi-label">Approved</div>
+              <div class="kpi-sub">Submissions approved</div>
+              <div class="kpi-bar"><div class="kpi-bar-fill" id="kApprovedBar" style="width:0%;background:var(--success)"></div></div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <div class="kpi-icon kpi-icon-amber">⏳</div>
+                <div class="kpi-badge kpi-badge-amber" id="kPendingBadge">0%</div>
+              </div>
+              <div class="kpi-val" id="kPending">0</div>
+              <div class="kpi-label">Pending</div>
+              <div class="kpi-sub">Awaiting review</div>
+              <div class="kpi-bar"><div class="kpi-bar-fill" id="kPendingBar" style="width:0%;background:var(--warning)"></div></div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <div class="kpi-icon kpi-icon-red">❌</div>
+                <div class="kpi-badge kpi-badge-red" id="kRejectedBadge">0%</div>
+              </div>
+              <div class="kpi-val" id="kRejected">0</div>
+              <div class="kpi-label">Rejected</div>
+              <div class="kpi-sub">Declined submissions</div>
+              <div class="kpi-bar"><div class="kpi-bar-fill" id="kRejectedBar" style="width:0%;background:var(--danger)"></div></div>
+            </div>
           </div>
-          <div class="kpi-val" id="kTotalScans">0</div>
-          <div class="kpi-label">Total Scans</div>
-          <div class="kpi-sub" id="kScansSub">All time</div>
-          <div class="kpi-bar"><div class="kpi-bar-fill" id="kTotalBar" style="width:100%"></div></div>
-        </div>
-        <div class="kpi-card kpi-green">
-          <div class="kpi-top">
-            <div class="kpi-icon">✅</div>
-            <div class="kpi-badge" id="kApprovedBadge">0%</div>
-          </div>
-          <div class="kpi-val" id="kApproved">0</div>
-          <div class="kpi-label">Approved</div>
-          <div class="kpi-sub">Submission approved</div>
-          <div class="kpi-bar"><div class="kpi-bar-fill" id="kApprovedBar" style="width:0%"></div></div>
-        </div>
-        <div class="kpi-card kpi-amber">
-          <div class="kpi-top">
-            <div class="kpi-icon">⏳</div>
-            <div class="kpi-badge" id="kPendingBadge">0%</div>
-          </div>
-          <div class="kpi-val" id="kPending">0</div>
-          <div class="kpi-label">Pending</div>
-          <div class="kpi-sub">Awaiting review</div>
-          <div class="kpi-bar"><div class="kpi-bar-fill" id="kPendingBar" style="width:0%"></div></div>
-        </div>
-        <div class="kpi-card kpi-red">
-          <div class="kpi-top">
-            <div class="kpi-icon">❌</div>
-            <div class="kpi-badge" id="kRejectedBadge">0%</div>
-          </div>
-          <div class="kpi-val" id="kRejected">0</div>
-          <div class="kpi-label">Rejected</div>
-          <div class="kpi-sub">Declined submissions</div>
-          <div class="kpi-bar"><div class="kpi-bar-fill" id="kRejectedBar" style="width:0%"></div></div>
-        </div>
-      </div>
-      <!-- KPIs Row 2 -->
-      <div class="kpi-row" style="margin-bottom:24px">
-        <div class="kpi-card kpi-blue">
-          <div class="kpi-top">
-            <div class="kpi-icon">👨‍🌾</div>
-            <div class="kpi-badge" id="kUniqueFarmersBadge">Unique</div>
-          </div>
-          <div class="kpi-val" id="kFarmers">0</div>
-          <div class="kpi-label">Total Farmers</div>
-          <div class="kpi-sub" id="kFarmersSub">0 unique</div>
-          <div class="kpi-bar"><div class="kpi-bar-fill" id="kFarmersBar" style="width:0%"></div></div>
-        </div>
-        <div class="kpi-card kpi-purple">
-          <div class="kpi-top">
-            <div class="kpi-icon">🏪</div>
-            <div class="kpi-badge" id="kRetailerBadge">Active</div>
-          </div>
-          <div class="kpi-val" id="kRetailers">0</div>
-          <div class="kpi-label">Active Retailers</div>
-          <div class="kpi-sub" id="kRetailersSub">of total</div>
-          <div class="kpi-bar"><div class="kpi-bar-fill" id="kRetailersBar" style="width:0%"></div></div>
-        </div>
-        <div class="kpi-card kpi-teal">
-          <div class="kpi-top">
-            <div class="kpi-icon">📞</div>
-            <div class="kpi-badge">Missed</div>
-          </div>
-          <div class="kpi-val" id="kMissedCalls">0</div>
-          <div class="kpi-label">Missed Calls</div>
-          <div class="kpi-sub" id="kMissedCallsSub">Total registered</div>
-          <div class="kpi-bar"><div class="kpi-bar-fill" id="kMissedCallsBar" style="width:0%"></div></div>
-        </div>
-        <div class="kpi-card kpi-teal">
-          <div class="kpi-top">
-            <div class="kpi-icon">📱</div>
-            <div class="kpi-badge">Unique</div>
-          </div>
-          <div class="kpi-val" id="kUniqueCalls">0</div>
-          <div class="kpi-label">Unique Callers</div>
-          <div class="kpi-sub" id="kUniqueCallsSub">Distinct numbers</div>
-          <div class="kpi-bar"><div class="kpi-bar-fill" id="kUniqueCallsBar" style="width:0%"></div></div>
-        </div>
-      </div>
 
-      <!-- Trend + Donut -->
-      <div class="grid-2">
-        <div class="card col-span-2" style="grid-column: span 1">
-          <div class="card-title"><span class="card-title-dot"></span> Daily Scan Trend</div>
-          <canvas id="trendChart" height="200"></canvas>
-        </div>
-        <div class="card">
-          <div class="card-title"><span class="card-title-dot"></span> Approval Status</div>
-          <canvas id="statusChart" height="200"></canvas>
-        </div>
-      </div>
+          <!-- KPIs Row 2 -->
+          <div class="kpi-row" style="margin-bottom:24px">
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <div class="kpi-icon kpi-icon-blue">👨‍🌾</div>
+                <div class="kpi-badge kpi-badge-blue" id="kUniqueFarmersBadge">Unique</div>
+              </div>
+              <div class="kpi-val" id="kFarmers">0</div>
+              <div class="kpi-label">Total Farmers</div>
+              <div class="kpi-sub" id="kFarmersSub">0 unique</div>
+              <div class="kpi-bar"><div class="kpi-bar-fill" id="kFarmersBar" style="width:0%;background:var(--primary)"></div></div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <div class="kpi-icon kpi-icon-purple">🏪</div>
+                <div class="kpi-badge" style="background:#f0ebff;color:#7c3aed" id="kRetailerBadge">Active</div>
+              </div>
+              <div class="kpi-val" id="kRetailers">0</div>
+              <div class="kpi-label">Active Retailers</div>
+              <div class="kpi-sub" id="kRetailersSub">of total</div>
+              <div class="kpi-bar"><div class="kpi-bar-fill" id="kRetailersBar" style="width:0%;background:#7c3aed"></div></div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <div class="kpi-icon kpi-icon-teal">📞</div>
+                <div class="kpi-badge" style="background:#e0f7f7;color:#0d7377">Missed</div>
+              </div>
+              <div class="kpi-val" id="kMissedCalls">0</div>
+              <div class="kpi-label">Missed Calls</div>
+              <div class="kpi-sub" id="kMissedCallsSub">Total registered</div>
+              <div class="kpi-bar"><div class="kpi-bar-fill" id="kMissedCallsBar" style="width:0%;background:#0d7377"></div></div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <div class="kpi-icon kpi-icon-teal">📱</div>
+                <div class="kpi-badge" style="background:#e0f7f7;color:#0d7377">Unique</div>
+              </div>
+              <div class="kpi-val" id="kUniqueCalls">0</div>
+              <div class="kpi-label">Unique Callers</div>
+              <div class="kpi-sub" id="kUniqueCallsSub">Distinct numbers</div>
+              <div class="kpi-bar"><div class="kpi-bar-fill" id="kUniqueCallsBar" style="width:0%;background:#0d7377"></div></div>
+            </div>
+          </div>
 
-      <!-- Source + Walk-in vs FA -->
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-title"><span class="card-title-dot"></span> Participation by Source</div>
-          <canvas id="sourceChart" height="200"></canvas>
-        </div>
-        <div class="card">
-          <div class="card-title"><span class="card-title-dot"></span> Walk-in vs FA-Driven</div>
-          <canvas id="channelChart" height="200"></canvas>
-        </div>
-      </div>
+          <!-- Trend + Donut -->
+          <div class="grid-2">
+            <div class="card" style="grid-column:span 1">
+              <div class="card-title"><span class="card-title-dot"></span> Daily Scan Trend</div>
+              <canvas id="trendChart" height="200"></canvas>
+            </div>
+            <div class="card">
+              <div class="card-title"><span class="card-title-dot"></span> Approval Status</div>
+              <canvas id="statusChart" height="200"></canvas>
+            </div>
+          </div>
 
-      <!-- Map -->
-      <div class="card grid-12">
-        <div class="card-title"><span class="card-title-dot"></span> State-wise Distribution Map</div>
-        <div id="mapContainer"></div>
-      </div>
-    </div>
+          <!-- Source + Channel -->
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-title"><span class="card-title-dot"></span> Participation by Source</div>
+              <canvas id="sourceChart" height="200"></canvas>
+            </div>
+            <div class="card">
+              <div class="card-title"><span class="card-title-dot"></span> Walk-in vs FA-Driven</div>
+              <canvas id="channelChart" height="200"></canvas>
+            </div>
+          </div>
 
-    <!-- ══ TAB: FA PERFORMANCE ════════════════════════ -->
-    <div class="page-section" id="tab-fa">
-      <div class="kpi-row" style="grid-template-columns:repeat(3,1fr)">
-        <div class="kpi-card kpi-green">
-          <div class="kpi-top"><div class="kpi-icon">👤</div></div>
-          <div class="kpi-val" id="faTotal">0</div>
-          <div class="kpi-label">Total FAs</div>
-        </div>
-        <div class="kpi-card kpi-blue">
-          <div class="kpi-top"><div class="kpi-icon">📊</div></div>
-          <div class="kpi-val" id="faAvgLeads">0</div>
-          <div class="kpi-label">Avg Leads / FA</div>
-        </div>
-        <div class="kpi-card kpi-purple">
-          <div class="kpi-top"><div class="kpi-icon">🏆</div></div>
-          <div class="kpi-val" id="faTopLeads">0</div>
-          <div class="kpi-label">Top FA Leads</div>
-        </div>
-      </div>
-      <div class="grid-2">
-        <div class="card col-span-2">
-          <div class="card-title"><span class="card-title-dot"></span> FA-wise Lead Generation (Top 15)</div>
-          <canvas id="faLeadsChart" height="260"></canvas>
-        </div>
-        <div class="card col-span-2">
-          <div class="card-title"><span class="card-title-dot"></span> FA Submission Status Breakdown</div>
-          <canvas id="faStatusChart" height="260"></canvas>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title"><span class="card-title-dot"></span> FA Performance Table</div>
-        <div style="overflow-x:auto">
-          <table class="data-table" id="faTable">
-            <thead><tr>
-              <th>#</th><th>FA Name</th><th>Total Leads</th>
-              <th>Approved</th><th>Pending</th><th>Rejected</th>
-              <th>Approval Rate</th><th>Progress</th>
-            </tr></thead>
-            <tbody id="faTableBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══ TAB: RETAILER ══════════════════════════════ -->
-    <div class="page-section" id="tab-retailer">
-      <div class="kpi-row" style="grid-template-columns:repeat(3,1fr)">
-        <div class="kpi-card kpi-purple">
-          <div class="kpi-top"><div class="kpi-icon">🏪</div></div>
-          <div class="kpi-val" id="retActive">0</div>
-          <div class="kpi-label">Active Retailers</div>
-        </div>
-        <div class="kpi-card kpi-green">
-          <div class="kpi-top"><div class="kpi-icon">📦</div></div>
-          <div class="kpi-val" id="retTotalRed">0</div>
-          <div class="kpi-label">Total Redemptions</div>
-        </div>
-        <div class="kpi-card kpi-blue">
-          <div class="kpi-top"><div class="kpi-icon">✅</div></div>
-          <div class="kpi-val" id="retApproved">0</div>
-          <div class="kpi-label">Approved Orders</div>
-        </div>
-      </div>
-      <div class="grid-2">
-        <div class="card col-span-2">
-          <div class="card-title"><span class="card-title-dot"></span> Retailer Redemptions & Approvals (Top 12)</div>
-          <canvas id="retailerChart" height="260"></canvas>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title"><span class="card-title-dot"></span> Retailer Detail Table</div>
-        <div style="overflow-x:auto">
-          <table class="data-table" id="retTable">
-            <thead><tr>
-              <th>#</th><th>Retailer Name</th><th>Retailer ID</th>
-              <th>Total</th><th>Approved</th><th>Pending</th><th>Rejected</th>
-              <th>Qty Sold</th><th>Approval %</th>
-            </tr></thead>
-            <tbody id="retTableBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══ TAB: DISTRICT ══════════════════════════════ -->
-    <div class="page-section" id="tab-district">
-      <div class="grid-2">
-        <div class="card col-span-2">
-          <div class="card-title"><span class="card-title-dot"></span> District-level Daily Performance</div>
-          <canvas id="districtTrendChart" height="240"></canvas>
-        </div>
-        <div class="card">
-          <div class="card-title"><span class="card-title-dot"></span> District Scan Volume</div>
-          <canvas id="districtBarChart" height="280"></canvas>
-        </div>
-        <div class="card">
-          <div class="card-title"><span class="card-title-dot"></span> District Approval Rate</div>
-          <canvas id="districtApprovalChart" height="280"></canvas>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title"><span class="card-title-dot"></span> District Performance Summary</div>
-        <div class="district-table-wrap">
-          <table class="data-table" id="districtTable">
-            <thead><tr>
-              <th>District</th><th>Total Scans</th><th>Approved</th>
-              <th>Pending</th><th>Rejected</th><th>Approval %</th>
-              <th>Unique Farmers</th><th>Active Retailers</th>
-            </tr></thead>
-            <tbody id="districtTableBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══ TAB: SKU ════════════════════════════════════ -->
-    <div class="page-section" id="tab-sku">
-      <div class="card" style="margin-bottom:20px">
-        <div class="card-title"><span class="card-title-dot"></span> SKU-wise Product Consumption</div>
-        <div class="sku-grid" id="skuGrid"></div>
-      </div>
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-title"><span class="card-title-dot"></span> Product Volume (Quantity)</div>
-          <canvas id="skuQtyChart" height="280"></canvas>
-        </div>
-        <div class="card">
-          <div class="card-title"><span class="card-title-dot"></span> Product Frequency (Orders)</div>
-          <canvas id="skuFreqChart" height="280"></canvas>
-        </div>
-      </div>
-      <div class="grid-2">
-        <div class="card col-span-2">
-          <div class="card-title"><span class="card-title-dot"></span> SKU Purchase Details Table</div>
-          <div style="overflow-x:auto">
-            <table class="data-table" id="skuTable">
-              <thead><tr>
-                <th>Product</th><th>Variant</th><th>Total Qty</th>
-                <th>Order Count</th><th>Approved Qty</th><th>% of Total</th>
-              </tr></thead>
-              <tbody id="skuTableBody"></tbody>
-            </table>
+          <!-- Map -->
+          <div class="card grid-12">
+            <div class="card-title"><span class="card-title-dot"></span> State-wise Distribution Map</div>
+            <div id="mapContainer"></div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- ══ TAB: REPEAT FARMERS ════════════════════════ -->
-    <div class="page-section" id="tab-repeat">
-      <div class="repeat-summary">
-        <div class="repeat-stat">
-          <div class="repeat-stat-val" id="repeatCount">0</div>
-          <div class="repeat-stat-label">Repeat Farmers</div>
+        <!-- ══ TAB: FA PERFORMANCE ════════════════════════ -->
+        <div class="page-section" id="tab-fa">
+          <div class="kpi-row" style="grid-template-columns:repeat(3,1fr)">
+            <div class="kpi-card">
+              <div class="kpi-top"><div class="kpi-icon kpi-icon-blue">👤</div></div>
+              <div class="kpi-val" id="faTotal">0</div>
+              <div class="kpi-label">Total FAs</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-top"><div class="kpi-icon kpi-icon-blue">📊</div></div>
+              <div class="kpi-val" id="faAvgLeads">0</div>
+              <div class="kpi-label">Avg Leads / FA</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-top"><div class="kpi-icon kpi-icon-purple">🏆</div></div>
+              <div class="kpi-val" id="faTopLeads">0</div>
+              <div class="kpi-label">Top FA Leads</div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="card col-span-2">
+              <div class="card-title"><span class="card-title-dot"></span> FA-wise Lead Generation (Top 15)</div>
+              <canvas id="faLeadsChart" height="260"></canvas>
+            </div>
+            <div class="card col-span-2">
+              <div class="card-title"><span class="card-title-dot"></span> FA Submission Status Breakdown</div>
+              <canvas id="faStatusChart" height="260"></canvas>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="card-title-dot"></span> FA Performance Table</div>
+            <div style="overflow-x:auto">
+              <table class="data-table" id="faTable">
+                <thead><tr>
+                  <th>#</th><th>FA Name</th><th>Total Leads</th>
+                  <th>Approved</th><th>Pending</th><th>Rejected</th>
+                  <th>Approval Rate</th><th>Progress</th>
+                </tr></thead>
+                <tbody id="faTableBody"></tbody>
+              </table>
+            </div>
+          </div>
         </div>
-        <div class="repeat-stat">
-          <div class="repeat-stat-val" id="repeatTotal">0</div>
-          <div class="repeat-stat-label">Total Transactions</div>
-        </div>
-        <div class="repeat-stat">
-          <div class="repeat-stat-val" id="repeatAvg">0</div>
-          <div class="repeat-stat-label">Avg Transactions / Repeat</div>
-        </div>
-      </div>
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-title"><span class="card-title-dot"></span> Transaction Frequency Distribution</div>
-          <canvas id="repeatFreqChart" height="260"></canvas>
-        </div>
-        <div class="card">
-          <div class="card-title"><span class="card-title-dot"></span> Repeat Farmer Trend (by Month)</div>
-          <canvas id="repeatTrendChart" height="260"></canvas>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title"><span class="card-title-dot"></span> Repeat Farmer Records</div>
-        <div style="overflow-x:auto">
-          <table class="data-table" id="repeatTable">
-            <thead><tr>
-              <th>Phone</th><th>Name</th><th>District</th>
-              <th>Transactions</th><th>First Scan</th><th>Last Scan</th>
-              <th>Products</th><th>Status</th>
-            </tr></thead>
-            <tbody id="repeatTableBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
 
-  </main>
-</div>
+        <!-- ══ TAB: RETAILER ══════════════════════════════ -->
+        <div class="page-section" id="tab-retailer">
+          <div class="kpi-row" style="grid-template-columns:repeat(3,1fr)">
+            <div class="kpi-card">
+              <div class="kpi-top"><div class="kpi-icon kpi-icon-purple">🏪</div></div>
+              <div class="kpi-val" id="retActive">0</div>
+              <div class="kpi-label">Active Retailers</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-top"><div class="kpi-icon kpi-icon-blue">📦</div></div>
+              <div class="kpi-val" id="retTotalRed">0</div>
+              <div class="kpi-label">Total Redemptions</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-top"><div class="kpi-icon kpi-icon-green">✅</div></div>
+              <div class="kpi-val" id="retApproved">0</div>
+              <div class="kpi-label">Approved Orders</div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="card col-span-2">
+              <div class="card-title"><span class="card-title-dot"></span> Retailer Redemptions & Approvals (Top 12)</div>
+              <canvas id="retailerChart" height="260"></canvas>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="card-title-dot"></span> Retailer Detail Table</div>
+            <div style="overflow-x:auto">
+              <table class="data-table" id="retTable">
+                <thead><tr>
+                  <th>#</th><th>Retailer Name</th><th>Retailer ID</th>
+                  <th>Total</th><th>Approved</th><th>Pending</th><th>Rejected</th>
+                  <th>Qty Sold</th><th>Approval %</th>
+                </tr></thead>
+                <tbody id="retTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
 
-<footer class="footer">© 2025 Farmology · Campaign Intelligence Platform · West Bengal</footer>
+        <!-- ══ TAB: DISTRICT ══════════════════════════════ -->
+        <div class="page-section" id="tab-district">
+          <div class="grid-2">
+            <div class="card col-span-2">
+              <div class="card-title"><span class="card-title-dot"></span> District-level Daily Performance</div>
+              <canvas id="districtTrendChart" height="240"></canvas>
+            </div>
+            <div class="card">
+              <div class="card-title"><span class="card-title-dot"></span> District Scan Volume</div>
+              <canvas id="districtBarChart" height="280"></canvas>
+            </div>
+            <div class="card">
+              <div class="card-title"><span class="card-title-dot"></span> District Approval Rate</div>
+              <canvas id="districtApprovalChart" height="280"></canvas>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="card-title-dot"></span> District Performance Summary</div>
+            <div class="district-table-wrap">
+              <table class="data-table" id="districtTable">
+                <thead><tr>
+                  <th>District</th><th>Total Scans</th><th>Approved</th>
+                  <th>Pending</th><th>Rejected</th><th>Approval %</th>
+                  <th>Unique Farmers</th><th>Active Retailers</th>
+                </tr></thead>
+                <tbody id="districtTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ TAB: SKU ════════════════════════════════════ -->
+        <div class="page-section" id="tab-sku">
+          <div class="card" style="margin-bottom:20px">
+            <div class="card-title"><span class="card-title-dot"></span> SKU-wise Product Consumption</div>
+            <div class="sku-grid" id="skuGrid"></div>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-title"><span class="card-title-dot"></span> Product Volume (Quantity)</div>
+              <canvas id="skuQtyChart" height="280"></canvas>
+            </div>
+            <div class="card">
+              <div class="card-title"><span class="card-title-dot"></span> Product Frequency (Orders)</div>
+              <canvas id="skuFreqChart" height="280"></canvas>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="card col-span-2">
+              <div class="card-title"><span class="card-title-dot"></span> SKU Purchase Details Table</div>
+              <div style="overflow-x:auto">
+                <table class="data-table" id="skuTable">
+                  <thead><tr>
+                    <th>Product</th><th>Variant</th><th>Total Qty</th>
+                    <th>Order Count</th><th>Approved Qty</th><th>% of Total</th>
+                  </tr></thead>
+                  <tbody id="skuTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ TAB: REPEAT FARMERS ════════════════════════ -->
+        <div class="page-section" id="tab-repeat">
+          <div class="repeat-summary">
+            <div class="repeat-stat">
+              <div class="repeat-stat-val" id="repeatCount">0</div>
+              <div class="repeat-stat-label">Repeat Farmers</div>
+            </div>
+            <div class="repeat-stat">
+              <div class="repeat-stat-val" id="repeatTotal">0</div>
+              <div class="repeat-stat-label">Total Transactions</div>
+            </div>
+            <div class="repeat-stat">
+              <div class="repeat-stat-val" id="repeatAvg">0</div>
+              <div class="repeat-stat-label">Avg Transactions / Repeat</div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-title"><span class="card-title-dot"></span> Transaction Frequency Distribution</div>
+              <canvas id="repeatFreqChart" height="260"></canvas>
+            </div>
+            <div class="card">
+              <div class="card-title"><span class="card-title-dot"></span> Repeat Farmer Trend (by Month)</div>
+              <canvas id="repeatTrendChart" height="260"></canvas>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title"><span class="card-title-dot"></span> Repeat Farmer Records</div>
+            <div style="overflow-x:auto">
+              <table class="data-table" id="repeatTable">
+                <thead><tr>
+                  <th>Phone</th><th>Name</th><th>District</th>
+                  <th>Transactions</th><th>First Scan</th><th>Last Scan</th>
+                  <th>Products</th><th>Status</th>
+                </tr></thead>
+                <tbody id="repeatTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /main-inner -->
+    </main>
+
+    <footer class="footer">© 2025 Farmology · Campaign Intelligence Platform · West Bengal</footer>
+  </div><!-- /flex col -->
+</div><!-- /app-shell -->
 
 <script>
 // ── DATA & STATE ──────────────────────────────────────────
@@ -1100,23 +1163,22 @@ function makeChart(id, type, data, opts) {
   return CHARTS[id];
 }
 
-const PALETTE = ['#2F6BFF','#4A85FF','#0EA5E9','#7C5CFC','#2ECC71','#F5A623','#E74C3C','#9AA5B1','#6B778C','#2F3542','#818CF8','#34D399'];
+const PALETTE = ['#2F6BFF','#4A85FF','#2ECC71','#F5A623','#E74C3C','#7c3aed','#0d7377','#059669','#d97706','#6B778C','#374151','#C7D8FF'];
 function pal(n) { return Array.from({length:n},(_,i)=>PALETTE[i%PALETTE.length]); }
 
 const baseAxis = {
-  x: { grid:{color:'#E6EBF2',lineWidth:1}, ticks:{color:'#6B778C',font:{family:'Inter',size:11,weight:'600'}} },
-  y: { grid:{color:'#E6EBF2',lineWidth:1}, ticks:{color:'#6B778C',font:{family:'Inter',size:11,weight:'600'}} }
+  x: { grid:{color:'#EDF1F6',lineWidth:1}, ticks:{color:'#9AA5B1',font:{family:'Plus Jakarta Sans',size:11,weight:'600'}} },
+  y: { grid:{color:'#EDF1F6',lineWidth:1}, ticks:{color:'#9AA5B1',font:{family:'Plus Jakarta Sans',size:11,weight:'600'}} }
 };
 const baseLegend = {
-  labels:{ color:'#2F3542', padding:16, font:{family:'Inter',size:12,weight:'600'}, usePointStyle:true, pointStyle:'circle' }
+  labels:{ color:'#2F3542', padding:16, font:{family:'Plus Jakarta Sans',size:12,weight:'600'}, usePointStyle:true, pointStyle:'circle' }
 };
 const baseTooltip = {
   backgroundColor:'#FFFFFF', titleColor:'#2F3542', bodyColor:'#6B778C',
-  padding:12, cornerRadius:8, borderColor: '#E6EBF2', borderWidth: 1,
-  titleFont:{family:'Inter',size:13,weight:'700'},
-  bodyFont:{family:'Inter',size:12,weight:'500'},
-  boxPadding: 4, usePointStyle: true,
-  callbacks: { labelColor: function(ctx) { return { borderColor: 'transparent', backgroundColor: ctx.dataset.backgroundColor }; } }
+  padding:12, cornerRadius:8, borderColor:'#E6EBF2', borderWidth:1,
+  boxShadow:'0px 4px 10px rgba(0,0,0,0.1)',
+  titleFont:{family:'Plus Jakarta Sans',size:13,weight:'700'},
+  bodyFont:{family:'Plus Jakarta Sans',size:12}
 };
 
 // ── RENDER ALL ───────────────────────────────────────────
@@ -1125,7 +1187,6 @@ function render() {
   updateKPIs(rows);
   const activeTab = document.querySelector('.page-tab.active')?.dataset?.tab || 'overview';
   renderTabCharts(activeTab, rows);
-  setTimeout(() => { if(window.lucide) lucide.createIcons(); }, 100);
 }
 
 function renderTabCharts(tab, rows) {
@@ -1147,7 +1208,6 @@ function updateKPIs(rows) {
   const uniquePhones = new Set(phones).size;
   const rins = new Set(rows.map(r => trim(r['RIN'])).filter(Boolean));
 
-  // Missed calls
   let mc = 0, mcU = 0;
   if (MC_DATA.length > 0) {
     const filtMC = FILTERS.state ? MC_DATA.filter(r => {
@@ -1188,24 +1248,22 @@ function updateKPIs(rows) {
 
 // ── OVERVIEW CHARTS ───────────────────────────────────────
 function renderOverview(rows) {
-  // Trend
   const tMap = new Map();
   rows.forEach(r => { const k = toDateKey(trim(r['Scan Date'])); if(k) tMap.set(k,(tMap.get(k)||0)+1); });
   const trend = [...tMap].sort((a,b)=>a[0].localeCompare(b[0]));
   const tCtx = document.getElementById('trendChart').getContext('2d');
   const grad = tCtx.createLinearGradient(0,0,0,200);
-  grad.addColorStop(0,'rgba(45,106,79,.25)'); grad.addColorStop(1,'rgba(45,106,79,.02)');
+  grad.addColorStop(0,'rgba(47,107,255,.18)'); grad.addColorStop(1,'rgba(47,107,255,.02)');
   makeChart('trendChart','line',{
     labels: trend.map(x=>x[0]),
     datasets:[{
       label:'Scans', data: trend.map(x=>x[1]),
-      borderColor:'#2ECC71', backgroundColor:grad, borderWidth:2.5,
-      tension:.4, fill:true, pointRadius:4, pointBackgroundColor:'#2ECC71',
+      borderColor:'#2F6BFF', backgroundColor:grad, borderWidth:2.5,
+      tension:.4, fill:true, pointRadius:4, pointBackgroundColor:'#2F6BFF',
       pointBorderColor:'#fff', pointBorderWidth:2
     }]
   },{ scales:baseAxis, plugins:{ legend:{display:false}, tooltip:baseTooltip }, interaction:{intersect:false,mode:'index'} });
 
-  // Status donut
   const yes = rows.filter(r=>/^yes$/i.test(trim(r['Submission Status']))).length;
   const no  = rows.filter(r=>/^no$/i.test(trim(r['Submission Status']))).length;
   const pend= rows.filter(r=>/^pending$/i.test(trim(r['Submission Status']))).length;
@@ -1228,7 +1286,6 @@ function renderOverview(rows) {
     }
   });
 
-  // Source
   const srcMap = {};
   rows.forEach(r=>{ const s=trim(r.Source||''); if(s) srcMap[s]=(srcMap[s]||0)+1; });
   const srcArr = Object.entries(srcMap).sort((a,b)=>b[1]-a[1]);
@@ -1251,12 +1308,11 @@ function renderOverview(rows) {
     }
   });
 
-  // Walk-in vs FA (channel)
   const fa = rows.filter(r=>trim(r.PT||'')).length;
   const walkin = rows.length - fa;
   makeChart('channelChart','doughnut',{
     labels:['FA-Driven','Walk-in / Direct'],
-    datasets:[{ data:[fa,walkin], backgroundColor:['#2ECC71','#2F6BFF'], borderWidth:4, borderColor:'#fff', hoverOffset:8 }]
+    datasets:[{ data:[fa,walkin], backgroundColor:['#2F6BFF','#4A85FF'], borderWidth:4, borderColor:'#fff', hoverOffset:8 }]
   },{
     cutout:'65%',
     plugins:{
@@ -1309,7 +1365,7 @@ function renderFA(rows) {
   makeChart('faStatusChart','bar',{
     labels: top.map(x=>x.name),
     datasets:[
-      { label:'Approved %', data:top.map(x=>x.total?+(x.yes/x.total*100).toFixed(1):0), backgroundColor:'#2ECC71', borderRadius:6, barThickness:18 }
+      { label:'Approved %', data:top.map(x=>x.total?+(x.yes/x.total*100).toFixed(1):0), backgroundColor:'#2F6BFF', borderRadius:6, barThickness:18 }
     ]
   },{ plugins:{legend:{display:false}, tooltip:baseTooltip}, scales:{x:{...baseAxis.x},y:{...baseAxis.y, max:100}}, responsive:true });
 
@@ -1325,8 +1381,8 @@ function renderFA(rows) {
       <td class="mono">${pct(fa.yes, fa.total)}</td>
       <td style="min-width:120px">
         <div style="display:flex;align-items:center;gap:8px">
-          <div class="prog-bar"><div class="prog-fill" style="width:${fa.total?(fa.yes/fa.total*100).toFixed(1):0}%;background:#2ECC71"></div></div>
-          <span style="font-size:11px;color:#7a7874">${pct(fa.yes,fa.total)}</span>
+          <div class="prog-bar"><div class="prog-fill" style="width:${fa.total?(fa.yes/fa.total*100).toFixed(1):0}%;background:#2F6BFF"></div></div>
+          <span style="font-size:11px;color:#9AA5B1">${pct(fa.yes,fa.total)}</span>
         </div>
       </td>
     </tr>
@@ -1398,10 +1454,9 @@ function renderDistrict(rows) {
 
   const arr = Object.entries(dMap).map(([name,d])=>({name,...d,total:d.yes+d.no+d.pending})).sort((a,b)=>b.total-a.total);
 
-  // Trend chart for top 5 districts
   const top5 = arr.slice(0,5);
   const allDates = [...new Set(rows.map(r=>toDateKey(trim(r['Scan Date']))).filter(Boolean))].sort();
-  const tColors = ['#2ECC71','#2F6BFF','#7C5CFC','#F5A623','#0EA5E9'];
+  const tColors = ['#2F6BFF','#2ECC71','#7c3aed','#F5A623','#0d7377'];
   makeChart('districtTrendChart','line',{
     labels: allDates,
     datasets: top5.map((d,i)=>({
@@ -1418,13 +1473,13 @@ function renderDistrict(rows) {
 
   makeChart('districtApprovalChart','bar',{
     labels: arr.map(x=>x.name),
-    datasets:[{ label:'Approval Rate %', data:arr.map(x=>x.total?+(x.yes/x.total*100).toFixed(1):0), backgroundColor:'#2ECC71', borderRadius:6 }]
+    datasets:[{ label:'Approval Rate %', data:arr.map(x=>x.total?+(x.yes/x.total*100).toFixed(1):0), backgroundColor:'#2F6BFF', borderRadius:6 }]
   },{ plugins:{legend:{display:false}, tooltip:baseTooltip}, scales:{x:{...baseAxis.x},y:{...baseAxis.y,max:100}} });
 
   const tbody = document.getElementById('districtTableBody');
   tbody.innerHTML = arr.map(d=>`
     <tr>
-      <td style="font-weight:700">${d.name}${TARGET_DISTRICTS.includes(d.name)?'<span class="badge badge-green" style="margin-left:6px">Target</span>':''}</td>
+      <td style="font-weight:700">${d.name}${TARGET_DISTRICTS.includes(d.name)?'<span class="badge badge-blue" style="margin-left:6px">Target</span>':''}</td>
       <td class="mono">${fmt(d.total)}</td>
       <td class="mono"><span class="badge badge-green">${fmt(d.yes)}</span></td>
       <td class="mono"><span class="badge badge-amber">${fmt(d.pending)}</span></td>
@@ -1453,7 +1508,6 @@ function renderSKU(rows) {
   const arr = Object.values(skuMap).sort((a,b)=>b.qty-a.qty);
   const totalQty = arr.reduce((s,x)=>s+x.qty,0);
 
-  // SKU grid cards
   const skuGrid = document.getElementById('skuGrid');
   skuGrid.innerHTML = arr.map(s=>`
     <div class="sku-card">
@@ -1510,7 +1564,6 @@ function renderRepeat(rows) {
   document.getElementById('repeatTotal').textContent = fmt(totalTx);
   document.getElementById('repeatAvg').textContent = repeatFarmers.length ? (totalTx/repeatFarmers.length).toFixed(1) : '0';
 
-  // Frequency distribution
   const freqDist = {};
   repeatFarmers.forEach(f=>{ const c=f.dates.length; freqDist[c]=(freqDist[c]||0)+1; });
   const freqArr = Object.entries(freqDist).sort((a,b)=>a[0]-b[0]);
@@ -1519,7 +1572,6 @@ function renderRepeat(rows) {
     datasets:[{ label:'Farmers', data:freqArr.map(x=>x[1]), backgroundColor:'#2F6BFF', borderRadius:6 }]
   },{ plugins:{legend:{display:false}, tooltip:baseTooltip}, scales:{x:{...baseAxis.x},y:{...baseAxis.y}} });
 
-  // Monthly trend for repeat
   const monthMap = {};
   repeatFarmers.forEach(f=>f.dates.forEach(dk=>{
     if(!dk) return;
@@ -1530,7 +1582,7 @@ function renderRepeat(rows) {
   const monthArr = Object.entries(monthMap).sort((a,b)=>a[0].localeCompare(b[0]));
   makeChart('repeatTrendChart','line',{
     labels: monthArr.map(x=>x[0]),
-    datasets:[{ label:'Repeat Farmer Interactions', data:monthArr.map(x=>x[1].size), borderColor:'#7C5CFC', backgroundColor:'rgba(124,92,252,.1)', fill:true, tension:.4, borderWidth:2.5 }]
+    datasets:[{ label:'Repeat Farmer Interactions', data:monthArr.map(x=>x[1].size), borderColor:'#7c3aed', backgroundColor:'rgba(124,58,237,.08)', fill:true, tension:.4, borderWidth:2.5 }]
   },{ scales:baseAxis, plugins:{legend:{display:false}, tooltip:baseTooltip} });
 
   const tbody = document.getElementById('repeatTableBody');
@@ -1587,7 +1639,7 @@ function renderMap(rows) {
   Object.entries(stateData).forEach(([st,d])=>{
     const coords = STATE_COORDS[st]; if(!coords||!d.yes) return;
     const rate = d.total>0?(d.yes/d.total*100).toFixed(0):0;
-    const color = d.yes>=500?'#2ECC71':d.yes>=200?'#2F6BFF':d.yes>=50?'#7C5CFC':'#F5A623';
+    const color = d.yes>=500?'#2F6BFF':d.yes>=200?'#2ECC71':d.yes>=50?'#7c3aed':'#F5A623';
 
     const icon = L.divIcon({
       className:'',
@@ -1603,11 +1655,11 @@ function renderMap(rows) {
       <div class="map-popup">
         <div class="map-popup-head"><h4>${st}</h4><p>Campaign Activity</p></div>
         <div class="map-popup-body">
-          <div class="map-row"><span class="map-row-label"><i data-lucide="check-circle-2" style="width:14px;display:inline-block;margin-right:4px;vertical-align:-2px;"></i> Approved</span><span class="map-row-val" style="color:#2ECC71">${fmt(d.yes)}</span></div>
-          <div class="map-row"><span class="map-row-label"><i data-lucide="clock" style="width:14px;display:inline-block;margin-right:4px;vertical-align:-2px;"></i> Pending</span><span class="map-row-val" style="color:#F5A623">${fmt(d.pend)}</span></div>
-          <div class="map-row"><span class="map-row-label"><i data-lucide="x-circle" style="width:14px;display:inline-block;margin-right:4px;vertical-align:-2px;"></i> Rejected</span><span class="map-row-val" style="color:#E74C3C">${fmt(d.no)}</span></div>
-          <div class="map-row"><span class="map-row-label"><i data-lucide="bar-chart-2" style="width:14px;display:inline-block;margin-right:4px;vertical-align:-2px;"></i> Total</span><span class="map-row-val">${fmt(d.total)}</span></div>
-          <div class="map-row"><span class="map-row-label"><i data-lucide="target" style="width:14px;display:inline-block;margin-right:4px;vertical-align:-2px;"></i> Approval Rate</span><span class="map-row-val" style="color:#2ECC71">${rate}%</span></div>
+          <div class="map-row"><span class="map-row-label">✅ Approved</span><span class="map-row-val" style="color:#2ECC71">${fmt(d.yes)}</span></div>
+          <div class="map-row"><span class="map-row-label">⏳ Pending</span><span class="map-row-val" style="color:#F5A623">${fmt(d.pend)}</span></div>
+          <div class="map-row"><span class="map-row-label">❌ Rejected</span><span class="map-row-val" style="color:#E74C3C">${fmt(d.no)}</span></div>
+          <div class="map-row"><span class="map-row-label">📊 Total</span><span class="map-row-val">${fmt(d.total)}</span></div>
+          <div class="map-row"><span class="map-row-label">🎯 Approval Rate</span><span class="map-row-val" style="color:#2F6BFF">${rate}%</span></div>
         </div>
       </div>`,{maxWidth:300}).addTo(mapLayerGroup);
     m.on('click',()=>{ document.getElementById('fState').value=st; FILTERS.state=st; populateFilters(RAW,REFERENCE_DATA,true); render(); });
